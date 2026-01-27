@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | FUTZONE</title>
+    <link rel="stylesheet" href="res/bootstrap@5.2.0.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #111827; /* Dark */
+            color: white;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h2 { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+
+        .card-registro {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .form-control {
+            background: #374151;
+            border: 1px solid #4b5563;
+            color: white;
+        }
+        .form-control:focus {
+            background: #4b5563;
+            color: white;
+            border-color: #00b4d8;
+            box-shadow: 0 0 0 0.25rem rgba(0, 180, 216, 0.25);
+        }
+
+        .btn-register {
+            background-color: #00b4d8;
+            color: #111827;
+            font-family: 'Teko', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            width: 100%;
+            border: none;
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        
+        .link-login { color: #00b4d8; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="card-registro">
+        <div class="text-center mb-4">
+            <h2 class="text-white">Crear Cuenta</h2>
+            <p class="text-secondary small">Únete a la comunidad FUTZONE</p>
+        </div>
+
+        <form id="registroForm">
+            <div class="mb-3">
+                <label class="form-label small text-secondary">Nombre Completo</label>
+                <input type="text" id="nombre" class="form-control" required placeholder="Ej: Lionel Messi">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-secondary">Teléfono</label>
+                <input type="tel" id="telefono" class="form-control" required placeholder="Ej: 11 1234 5678">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-secondary">Email</label>
+                <input type="email" id="email" class="form-control" required placeholder="tu@email.com">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small text-secondary">Contraseña</label>
+                <input type="password" id="password" class="form-control" required placeholder="Mínimo 6 caracteres">
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn btn-register btn-lg mb-3">
+                REGISTRARSE
+            </button>
+
+            <div id="msgError" class="alert alert-danger d-none text-center small p-2"></div>
+        </form>
+
+        <div class="text-center mt-2">
+            <small class="text-secondary">¿Ya tienes cuenta? <a href="login.html" class="link-login">Inicia Sesión</a></small>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importamos Firebase y nuestra función del Excel
+        import { auth } from './js/firebase-config.js';
+        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { guardarEnExcel } from './js/sheet-api.js';
+
+        const form = document.getElementById('registroForm');
+        const btn = document.getElementById('btnSubmit');
+        const msg = document.getElementById('msgError');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 1. Efecto de "Cargando..."
+            const originalText = btn.innerText;
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+            msg.classList.add('d-none');
+
+            // 2. Obtener datos
+            const nombre = document.getElementById('nombre').value;
+            const telefono = document.getElementById('telefono').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // 3. Crear usuario en Firebase (Autenticación)
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log("Usuario creado en Firebase:", userCredential.user.uid);
+
+                // 4. Guardar en el Excel del Cliente (Base de Datos)
+                btn.innerText = "GUARDANDO DATOS...";
+                await guardarEnExcel(nombre, email, telefono);
+
+                // 5. ¡Éxito! Redirigir al panel
+                alert("¡Cuenta creada con éxito! Bienvenido a FUTZONE.");
+                window.location.href = "dashboard.html";
+
+            } catch (error) {
+                console.error(error);
+                let mensaje = "Error al crear cuenta: " + error.message;
+                if (error.code === 'auth/email-already-in-use') mensaje = "Ese email ya está registrado.";
+                if (error.code === 'auth/weak-password') mensaje = "La contraseña debe tener al menos 6 caracteres.";
+                
+                msg.innerText = mensaje;
+                msg.classList.remove('d-none');
+                
+                // Restaurar botón
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

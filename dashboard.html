@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel | FUTZONE</title>
+    <link rel="stylesheet" href="res/bootstrap@5.2.0.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --futzone-blue: #00b4d8; --futzone-dark: #111827; }
+        body { background-color: var(--futzone-dark); color: white; font-family: 'Inter', sans-serif; padding-bottom: 80px; }
+        h1, h2, h3, .btn-font { font-family: 'Teko', sans-serif; text-transform: uppercase; }
+
+        /* Tarjeta de Clases Disponibles */
+        .card-info {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,180,216, 0.1);
+        }
+
+        /* Tarjeta de Turno */
+        .card-turno {
+            background-color: #1f2937;
+            border-left: 5px solid var(--futzone-blue);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .actividad-title { font-size: 1.5rem; font-weight: bold; font-family: 'Teko'; color: white; line-height: 1; }
+        .turno-meta { font-size: 0.9rem; color: #9ca3af; }
+        
+        /* Botón Reservar */
+        .btn-reservar {
+            background-color: var(--futzone-blue); color: #111827; 
+            border: none; font-weight: bold; font-family: 'Teko'; font-size: 1.1rem;
+            padding: 5px 15px; clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        .btn-reservar:disabled { background-color: #4b5563; color: #9ca3af; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark bg-dark mb-4 sticky-top border-bottom border-secondary">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand h1 m-0">MI <span style="color:var(--futzone-blue)">ZONA</span></span>
+            <button id="btnSalir" class="btn btn-sm btn-outline-secondary">SALIR</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="mb-4">
+            <h2 class="mb-3">HOLA, <span id="txtNombre" class="text-info">SOCIO</span></h2>
+            
+            <div class="card-info">
+                <small class="text-secondary text-uppercase tracking-wider">Tus Clases Disponibles</small>
+                <div id="txtClases" class="display-1 fw-bold text-white my-2">-</div>
+                <div id="txtEstado" class="badge bg-secondary">Cargando...</div>
+            </div>
+        </div>
+
+        <hr class="border-secondary my-4">
+
+        <h3 class="mb-3">📅 PRÓXIMAS CLASES</h3>
+        <div id="listaTurnos">
+            <div class="text-center text-secondary py-5">
+                <div class="spinner-border text-info mb-2"></div>
+                <p>Buscando horarios...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { auth } from './js/firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { consultarEstadoExcel, obtenerTurnos, reservarTurno } from './js/sheet-api.js';
+
+        let userEmail = "";
+        let clasesDisponibles = 0;
+
+        // 1. VERIFICAR LOGIN Y CARGAR DATOS
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userEmail = user.email;
+                await cargarDatosUsuario(userEmail);
+                await cargarTurnos(userEmail);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // 2. CARGAR INFO DEL USUARIO (CLASES)
+        async function cargarDatosUsuario(email) {
+            const data = await consultarEstadoExcel(email);
+            
+            if (data && data.result === "success") {
+                const usuario = data.data;
+                document.getElementById('txtNombre').innerText = usuario.nombre.split(" ")[0]; // Solo primer nombre
+                
+                clasesDisponibles = parseInt(usuario.clases);
+                document.getElementById('txtClases').innerText = clasesDisponibles;
+                
+                const estadoEl = document.getElementById('txtEstado');
+                estadoEl.innerText = usuario.estado === "AL DIA" ? "HABILITADO" : "PAGO PENDIENTE";
+                estadoEl.className = usuario.estado === "AL DIA" ? "badge bg-success" : "badge bg-danger";
+            }
+        }
+
+        // 3. CARGAR LISTA DE TURNOS
+        async function cargarTurnos(email) {
+            const container = document.getElementById('listaTurnos');
+            const turnos = await obtenerTurnos(email);
+
+            container.innerHTML = ""; // Limpiar
+
+            if (turnos.length === 0) {
+                container.innerHTML = '<div class="alert alert-dark text-center">No hay clases programadas pronto.</div>';
+                return;
+            }
+
+            turnos.forEach(turno => {
+                // Formatear fecha
+                const fechaObj = new Date(turno.fecha);
+                const dia = fechaObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' });
+                
+                // Lógica del botón
+                let btnHtml = "";
+                if (turno.yaInscrito) {
+                    btnHtml = `<button class="btn btn-success w-100" disabled>YA ESTÁS ANOTADO ✔</button>`;
+                } else if (turno.ocupados >= turno.cupo) {
+                    btnHtml = `<button class="btn btn-secondary w-100" disabled>LLENO ⛔</button>`;
+                } else {
+                    // Botón de Reservar Activo
+                    btnHtml = `<button onclick="confirmarReserva('${turno.id}', '${turno.actividad}', '${turno.hora}')" class="btn-reservar w-100">RESERVAR LUGAR</button>`;
+                }
+
+                const card = `
+                    <div class="card-turno">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="actividad-title text-uppercase">${turno.actividad}</div>
+                                <div class="turno-meta text-info">📅 ${dia} | ⏰ ${turno.hora} hs</div>
+                            </div>
+                            <div class="text-center bg-dark p-2 rounded border border-secondary">
+                                <div class="fw-bold fs-5">${turno.cupo - turno.ocupados}</div>
+                                <small style="font-size:0.6rem; color:#9ca3af;">LIBRES</small>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            ${btnHtml}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // 4. FUNCIÓN GLOBAL PARA EL CLICK DEL BOTÓN
+        window.confirmarReserva = async function(idTurno, actividad, hora) {
+            if (clasesDisponibles <= 0) {
+                alert("⛔ No tienes clases disponibles. Contacta a administración.");
+                return;
+            }
+
+            if (!confirm(`¿Confirmar reserva para ${actividad} a las ${hora}? Se descontará 1 clase.`)) return;
+
+            // Feedback visual simple
+            alert("Procesando reserva... Por favor espera.");
+
+            const exito = await reservarTurno(userEmail, idTurno);
+
+            if (exito) {
+                alert("✅ ¡Reserva Exitosa!");
+                location.reload(); // Recargar para actualizar clases y lista
+            } else {
+                alert("❌ Ocurrió un error. Intenta nuevamente (Puede que el cupo se haya llenado).");
+                location.reload();
+            }
+        };
+
+        // SALIR
+        document.getElementById('btnSalir').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = "login.html");
+        });
+    </script>
+</body>
+</html>
