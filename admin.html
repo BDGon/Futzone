@@ -12,7 +12,7 @@
         body { background-color: var(--futzone-dark); color: white; font-family: 'Inter', sans-serif; padding-bottom: 80px; }
         h2, h5, .navbar-brand { font-family: 'Teko', sans-serif; text-transform: uppercase; }
 
-        .card-socio {
+        .card-socio, .card-turno {
             background-color: var(--bg-card);
             border: 1px solid #374151;
             border-radius: 12px;
@@ -26,19 +26,9 @@
             font-size: 0.9rem; padding: 8px; border-radius: 6px; width: 100%;
         }
 
-        /* Botón Guardar (Azul) */
-        .btn-save {
-            background-color: var(--futzone-blue); color: var(--futzone-dark); 
-            border: none; font-weight: bold; padding: 8px 0; width: 100%;
-            border-radius: 6px; font-family: 'Teko'; font-size: 1.2rem;
-        }
-
-        /* Botón Eliminar (Rojo Pequeño) */
-        .btn-delete {
-            background-color: #ef4444; color: white; border: none;
-            border-radius: 6px; padding: 8px 12px; font-weight: bold;
-            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
-        }
+        .btn-save { background-color: var(--futzone-blue); color: var(--futzone-dark); border: none; font-weight: bold; padding: 8px 0; width: 100%; border-radius: 6px; font-family: 'Teko'; font-size: 1.2rem; }
+        .btn-delete { background-color: #ef4444; color: white; border: none; border-radius: 6px; padding: 8px 12px; font-weight: bold; }
+        .btn-view { background-color: #374151; border: 1px solid var(--futzone-blue); color: var(--futzone-blue); border-radius: 6px; padding: 5px 10px; font-family: 'Teko'; width: 100%; }
         
         .status-ok { color: #4ade80; font-weight: bold; }
         .status-bad { color: #f87171; font-weight: bold; }
@@ -55,45 +45,35 @@
 
     <div class="container">
         
-        <div class="card-socio mb-5" style="border: 1px solid #00b4d8; position: relative; overflow: hidden;">
-            <div style="position: absolute; top:-10px; right:-10px; font-size: 4rem; opacity: 0.1; transform: rotate(15deg);">📅</div>
-            <h5 class="text-white mb-3" style="letter-spacing:1px; color: #00b4d8;">ABRIR NUEVA FECHA</h5>
-            
+        <div class="card-socio mb-4" style="border: 1px solid #00b4d8;">
+            <h5 class="text-white mb-3" style="color: #00b4d8;">ABRIR NUEVA FECHA</h5>
             <form id="formTurno" class="row g-2 align-items-end">
-                <div class="col-12">
-                    <label class="small text-secondary mb-1">ACTIVIDAD</label>
-                    <input type="text" id="inputActividad" class="form-input-dark" placeholder="Ej: Funcional..." required>
-                </div>
-                <div class="col-6">
-                    <label class="small text-secondary mb-1">FECHA</label>
-                    <input type="date" id="inputFecha" class="form-input-dark" required>
-                </div>
-                <div class="col-3">
-                    <label class="small text-secondary mb-1">HORA</label>
-                    <input type="time" id="inputHora" class="form-input-dark" required>
-                </div>
-                <div class="col-3">
-                    <label class="small text-secondary mb-1">CUPO</label>
-                    <input type="number" id="inputCupo" class="form-input-dark text-center" value="12" required>
-                </div>
-                <div class="col-12 mt-3">
-                    <button type="submit" id="btnCrearTurno" class="btn-save">HABILITAR TURNO</button>
-                </div>
+                <div class="col-12"><label class="small text-secondary mb-1">ACTIVIDAD</label><input type="text" id="inputActividad" class="form-input-dark" placeholder="Ej: Funcional..." required></div>
+                <div class="col-6"><label class="small text-secondary mb-1">FECHA</label><input type="date" id="inputFecha" class="form-input-dark" required></div>
+                <div class="col-3"><label class="small text-secondary mb-1">HORA</label><input type="time" id="inputHora" class="form-input-dark" required></div>
+                <div class="col-3"><label class="small text-secondary mb-1">CUPO</label><input type="number" id="inputCupo" class="form-input-dark text-center" value="12" required></div>
+                <div class="col-12 mt-3"><button type="submit" id="btnCrearTurno" class="btn-save">HABILITAR TURNO</button></div>
             </form>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="m-0">CLASES ACTIVAS</h2>
+            <button onclick="cargarTurnosAdmin()" class="btn btn-outline-info btn-sm">↻</button>
+        </div>
+        
+        <div id="listaTurnosAdmin" class="mb-5">
+            <div class="text-center text-secondary py-3"><p>Cargando clases...</p></div>
         </div>
 
         <hr class="border-secondary my-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="m-0">LISTA DE SOCIOS</h2>
             <button onclick="cargarUsuarios()" class="btn btn-outline-info btn-sm">↻</button>
         </div>
 
         <div id="listaSocios">
-            <div class="text-center text-secondary mt-5 py-5">
-                <div class="spinner-border text-info mb-3"></div>
-                <p>Cargando base de datos...</p>
-            </div>
+            <div class="text-center text-secondary py-3"><p>Cargando socios...</p></div>
         </div>
     </div>
 
@@ -101,73 +81,75 @@
         const rol = localStorage.getItem("rolUsuario");
         if (rol !== "ADMIN") window.location.href = "login.html";
 
-        import { obtenerTodosLosUsuarios, actualizarUsuario, crearTurno, eliminarUsuario } from './js/sheet-api.js';
+        import { obtenerTodosLosUsuarios, actualizarUsuario, crearTurno, eliminarUsuario, obtenerTurnos, eliminarTurno } from './js/sheet-api.js';
 
         window.usuariosCache = [];
+        window.turnosCache = [];
 
-        // --- CREAR TURNO ---
+        // --- 1. CREAR TURNO ---
         document.getElementById('formTurno').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnCrearTurno');
+            btn.innerText = "..."; btn.disabled = true;
             
             const act = document.getElementById('inputActividad').value;
             const fec = document.getElementById('inputFecha').value;
             const hor = document.getElementById('inputHora').value;
             const cup = document.getElementById('inputCupo').value;
 
-            btn.innerText = "..."; btn.disabled = true;
             if (await crearTurno(fec, hor, act, cup)) {
                 alert("¡Turno creado!"); document.getElementById('formTurno').reset();
+                cargarTurnosAdmin(); // Recargar lista de turnos
             } else { alert("Error."); }
             btn.innerText = "HABILITAR TURNO"; btn.disabled = false;
         });
 
-        // --- CARGAR USUARIOS ---
-        window.cargarUsuarios = async function() {
-            const container = document.getElementById('listaSocios');
-            container.innerHTML = '<div class="text-center text-info mt-5">Actualizando...</div>';
+        // --- 2. CARGAR TURNOS ADMIN (NUEVO) ---
+        window.cargarTurnosAdmin = async function() {
+            const container = document.getElementById('listaTurnosAdmin');
+            container.innerHTML = '<div class="text-center text-info py-3">Actualizando...</div>';
             
-            const usuarios = await obtenerTodosLosUsuarios();
-            window.usuariosCache = usuarios;
+            const turnos = await obtenerTurnos(); // Trae todos los turnos futuros
+            window.turnosCache = turnos;
             container.innerHTML = '';
 
-            if (!usuarios || usuarios.length === 0) {
-                container.innerHTML = '<div class="alert alert-dark text-center">No hay socios.</div>';
+            if (turnos.length === 0) {
+                container.innerHTML = '<div class="alert alert-dark text-center">No hay clases programadas.</div>';
                 return;
             }
 
-            usuarios.forEach((usuario, index) => {
-                const esAlDia = usuario.estado === 'AL DIA';
+            turnos.forEach((turno, index) => {
+                // Formato Fecha
+                const fechaObj = new Date(turno.fecha);
+                const dia = fechaObj.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'numeric' });
                 
+                // Lista de inscritos para mostrar en la alerta
+                const listaEmails = turno.inscritos_emails && turno.inscritos_emails.length > 0 
+                    ? turno.inscritos_emails.join("\n- ") 
+                    : "Nadie inscrito aún.";
+
                 const card = `
-                    <div class="card-socio">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div style="overflow: hidden;">
-                                <h5 class="m-0 fw-bold text-white text-truncate">${usuario.nombre}</h5>
-                                <small class="text-secondary d-block text-truncate" style="font-size: 0.75rem;">${usuario.email}</small>
+                    <div class="card-turno">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="m-0 fw-bold text-white text-uppercase">${turno.actividad}</h5>
+                                <div class="text-info small mt-1">📅 ${dia} | ⏰ ${turno.hora}</div>
                             </div>
-                            <span class="badge bg-dark border border-secondary text-secondary ms-2">${usuario.telefono}</span>
+                            <div class="text-center bg-dark p-2 rounded border border-secondary">
+                                <div class="fw-bold">${turno.ocupados}/${turno.cupo}</div>
+                            </div>
                         </div>
 
-                        <div class="row g-2 align-items-end">
-                            <div class="col-5">
-                                <label class="small text-secondary mb-1" style="font-size:0.7rem;">ESTADO</label>
-                                <select id="estado-${index}" class="form-select-dark">
-                                    <option value="AL DIA" ${esAlDia ? 'selected' : ''} class="status-ok">AL DÍA 🟢</option>
-                                    <option value="PENDIENTE" ${!esAlDia ? 'selected' : ''} class="status-bad">DEBE 🔴</option>
-                                </select>
+                        <div class="row mt-3 g-2">
+                            <div class="col-8">
+                                <button onclick="verInscritos('${listaEmails}')" class="btn-view">
+                                    👥 VER ALUMNOS
+                                </button>
                             </div>
-                            <div class="col-3">
-                                <label class="small text-secondary mb-1" style="font-size:0.7rem;">CLASES</label>
-                                <input type="number" id="clases-${index}" class="form-input-dark text-center" value="${usuario.clases}">
-                            </div>
-                            
-                            <div class="col-2">
-                                <button onclick="guardarCambios(${index})" id="btn-${index}" class="btn-save shadow-sm">💾</button>
-                            </div>
-
-                            <div class="col-2">
-                                <button onclick="borrarSocio(${index})" class="btn-delete shadow-sm">🗑</button>
+                            <div class="col-4">
+                                <button onclick="borrarClase('${turno.id}')" class="btn-delete w-100">
+                                    🗑
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -176,49 +158,90 @@
             });
         };
 
-        // --- GUARDAR CAMBIOS ---
-        window.guardarCambios = async function(index) {
-            const usuario = window.usuariosCache[index];
-            const btn = document.getElementById(`btn-${index}`);
-            const est = document.getElementById(`estado-${index}`).value;
-            const cla = document.getElementById(`clases-${index}`).value;
+        // Ver lista de alumnos (Alerta simple)
+        window.verInscritos = function(lista) {
+            alert("ALUMNOS INSCRITOS:\n\n- " + lista);
+        }
 
-            btn.innerText = "..."; btn.disabled = true;
-            if (await actualizarUsuario(usuario.email, est, cla)) {
-                btn.innerText = "✔"; btn.style.backgroundColor = "#22c55e";
-                setTimeout(() => { btn.innerText = "💾"; btn.style.backgroundColor = ""; btn.disabled = false; }, 1500);
-            } else { alert("Error."); btn.innerText = "💾"; btn.disabled = false; }
+        // Borrar clase
+        window.borrarClase = async function(idTurno) {
+            if(!confirm("¿Borrar esta clase? Se eliminará de la agenda.")) return;
+            
+            // UI Feedback
+            const container = document.getElementById('listaTurnosAdmin');
+            container.innerHTML = '<div class="text-center text-danger py-3">Eliminando clase...</div>';
+
+            if(await eliminarTurno(idTurno)) {
+                alert("Clase eliminada.");
+            } else {
+                alert("Error al eliminar.");
+            }
+            cargarTurnosAdmin();
+        }
+
+        // --- 3. CARGAR SOCIOS ---
+        window.cargarUsuarios = async function() {
+            const container = document.getElementById('listaSocios');
+            const usuarios = await obtenerTodosLosUsuarios();
+            window.usuariosCache = usuarios;
+            container.innerHTML = '';
+
+            if (!usuarios || usuarios.length === 0) {
+                container.innerHTML = '<div class="alert alert-dark text-center">No hay socios.</div>'; return;
+            }
+
+            usuarios.forEach((usuario, index) => {
+                const esAlDia = usuario.estado === 'AL DIA';
+                const card = `
+                    <div class="card-socio">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div style="overflow: hidden;">
+                                <h6 class="m-0 fw-bold text-white text-truncate">${usuario.nombre}</h6>
+                                <small class="text-secondary d-block text-truncate">${usuario.email}</small>
+                            </div>
+                            <span class="badge bg-dark border border-secondary text-secondary">${usuario.telefono}</span>
+                        </div>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-5">
+                                <select id="estado-${index}" class="form-select-dark py-1" style="font-size:0.8rem;">
+                                    <option value="AL DIA" ${esAlDia ? 'selected' : ''} class="status-ok">AL DÍA</option>
+                                    <option value="PENDIENTE" ${!esAlDia ? 'selected' : ''} class="status-bad">DEBE</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <input type="number" id="clases-${index}" class="form-input-dark text-center py-1" value="${usuario.clases}">
+                            </div>
+                            <div class="col-2"><button onclick="guardarCambios(${index})" id="btn-${index}" class="btn-save py-1">💾</button></div>
+                            <div class="col-2"><button onclick="borrarSocio(${index})" class="btn-delete py-1 w-100">🗑</button></div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
         };
 
-        // --- ELIMINAR SOCIO (NUEVO) ---
-        window.borrarSocio = async function(index) {
-            const usuario = window.usuariosCache[index];
-            
-            // PREGUNTA DE SEGURIDAD
-            const confirmacion = confirm(`¿ESTÁS SEGURO?\n\nVas a eliminar a: ${usuario.nombre}\nEsta acción NO se puede deshacer.`);
-            
-            if (confirmacion) {
-                // Feedback visual inmediato (borrar tarjeta)
-                const container = document.getElementById('listaSocios');
-                container.innerHTML = '<div class="text-center text-danger mt-5">Eliminando socio...</div>';
+        window.guardarCambios = async function(index) {
+            const u = window.usuariosCache[index];
+            const btn = document.getElementById(`btn-${index}`);
+            btn.innerText = "..."; btn.disabled = true;
+            if (await actualizarUsuario(u.email, document.getElementById(`estado-${index}`).value, document.getElementById(`clases-${index}`).value)) {
+                btn.innerText = "✔"; setTimeout(() => { btn.innerText = "💾"; btn.disabled = false; }, 1500);
+            } else { btn.innerText = "Err"; btn.disabled = false; }
+        };
 
-                const exito = await eliminarUsuario(usuario.email);
-                
-                if (exito) {
-                    alert("Usuario eliminado correctamente.");
-                    cargarUsuarios(); // Recargar la lista
-                } else {
-                    alert("Error al eliminar. Intenta de nuevo.");
-                    cargarUsuarios();
-                }
-            }
+        window.borrarSocio = async function(index) {
+            if(!confirm(`¿Eliminar a ${window.usuariosCache[index].nombre}?`)) return;
+            if(await eliminarUsuario(window.usuariosCache[index].email)) { alert("Eliminado."); cargarUsuarios(); }
         };
 
         document.getElementById('btnSalir').addEventListener('click', () => {
             localStorage.removeItem("rolUsuario"); window.location.href = "login.html";
         });
 
+        // Iniciar todo
+        cargarTurnosAdmin();
         cargarUsuarios();
+
     </script>
 </body>
 </html>
