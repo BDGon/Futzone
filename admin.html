@@ -2,138 +2,171 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Panel Admin | FUTZONE</title>
-    
     <link rel="stylesheet" href="res/bootstrap@5.2.0.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Teko:wght@500;700&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --futzone-blue: #00b4d8;
-            --futzone-dark: #111827;
-            --bg-card: #1f2937;
-        }
-
+        :root { --futzone-blue: #00b4d8; --futzone-dark: #111827; }
+        
         body { 
             background-color: var(--futzone-dark); 
             color: white; 
             font-family: 'Inter', sans-serif; 
             padding-bottom: 80px; 
-            margin: 0;
+            margin: 0; 
+            width: 100%;
+            overflow-x: hidden;
         }
 
-        h2, h5, .navbar-brand, .btn-font { font-family: 'Teko', sans-serif; text-transform: uppercase; }
+        h2, h5, .navbar-brand { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* TARJETAS */
-        .card-socio, .card-turno {
-            background-color: var(--bg-card);
-            border: 1px solid #374151;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        /* NAVBAR MEJORADO */
+        .navbar {
+            background-color: #0f131a !important;
+            padding: 15px 0;
+            border-bottom: 1px solid #374151;
         }
 
-        /* INPUTS */
-        .form-select-dark, .form-input-dark {
+        /* TARJETAS GRANDES Y LIMPIAS */
+        .card-socio, .card-turno { 
+            background-color: #1f2937; 
+            border: 1px solid #374151; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* INPUTS GIGANTES */
+        .form-select-dark, .form-input-dark { 
             background-color: #374151; 
             color: white; 
-            border: 1px solid #4b5563;
-            font-size: 0.9rem; 
-            padding: 8px;
-            border-radius: 6px;
-            width: 100%;
+            border: 1px solid #4b5563; 
+            border-radius: 8px; 
+            width: 100%; 
+            padding: 12px; 
+            font-size: 1.1rem; 
+            margin-bottom: 5px;
         }
-        
-        /* BOTONES */
-        .btn-save {
-            background-color: var(--futzone-blue); color: var(--futzone-dark); 
-            border: none; font-weight: bold; padding: 8px 0; width: 100%;
-            border-radius: 6px; font-family: 'Teko'; font-size: 1.2rem;
-        }
-        .btn-delete {
-            background-color: #ef4444; color: white; border: none;
-            border-radius: 6px; padding: 8px; width: 100%;
-        }
-        .btn-view {
-            background-color: #374151; border: 1px solid var(--futzone-blue);
-            color: var(--futzone-blue); border-radius: 6px; padding: 5px;
-            font-family: 'Teko'; width: 100%;
+        .form-input-dark:focus {
+            border-color: var(--futzone-blue);
+            outline: none;
+            background-color: #4b5563;
         }
 
-        /* --- MODO APP EN PC (CONTENEDOR) --- */
+        /* BOTONES DE ACCIÓN */
+        .btn-save { 
+            background-color: var(--futzone-blue); 
+            color: #111827; 
+            border: none; 
+            font-weight: bold; 
+            width: 100%; 
+            border-radius: 8px; 
+            font-family: 'Teko'; 
+            font-size: 1.4rem; 
+            padding: 10px;
+        }
+        
+        .btn-delete { 
+            background-color: #ef4444; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            padding: 8px; 
+            width: 100%; 
+            font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .btn-view { 
+            background-color: transparent; 
+            border: 1px solid var(--futzone-blue); 
+            color: var(--futzone-blue); 
+            border-radius: 8px; 
+            width: 100%; 
+            font-family: 'Teko'; 
+            padding: 8px;
+            font-size: 1.2rem;
+        }
+
+        /* Etiquetas */
+        label { font-size: 0.9rem; color: #9ca3af; margin-bottom: 4px; margin-left: 2px; }
+
+        /* AJUSTES RESPONSIVOS (SIN BARRAS NEGRAS) */
+        .container {
+            max-width: 1000px; /* Límite de ancho para que no se estire infinito en TVs */
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* En PC mejoramos la grilla para aprovechar el espacio */
         @media (min-width: 768px) {
-            html { background-color: #050505; }
-            body {
-                max-width: 480px;
-                margin: 0 auto;
-                min-height: 100vh;
-                background-color: #111827;
-                border-left: 1px solid #333;
-                border-right: 1px solid #333;
-                position: relative;
-            }
-            .navbar {
-                max-width: 480px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 100%;
-                position: fixed; /* Fijo arriba dentro de la "App" */
-            }
-            .container { padding-top: 80px; } /* Espacio para el navbar */
+            .navbar { padding: 20px 0; }
+            .card-socio, .card-turno { padding: 25px; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-dark bg-dark mb-4 border-bottom border-secondary sticky-top">
+    <nav class="navbar navbar-dark sticky-top">
         <div class="container d-flex justify-content-between align-items-center">
-            <span class="navbar-brand h1 m-0">ADMIN <span style="color:var(--futzone-blue)">FUTZONE</span></span>
-            <button id="btnSalir" class="btn btn-sm btn-outline-danger" style="font-family:'Teko'">SALIR</button>
+            <span class="navbar-brand h2 m-0" style="font-size: 2rem;">ADMIN <span style="color:var(--futzone-blue)">FUTZONE</span></span>
+            <button id="btnSalir" class="btn btn-outline-danger" style="font-family:'Teko'; font-size: 1.1rem; letter-spacing:1px;">SALIR</button>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container mt-4">
         
-        <div class="card-socio mb-4" style="border: 1px solid #00b4d8;">
-            <h5 class="text-white mb-3" style="color: #00b4d8;">📅 ABRIR NUEVA FECHA</h5>
-            <form id="formTurno" class="row g-2 align-items-end">
-                <div class="col-12">
-                    <input type="text" id="inputActividad" class="form-input-dark" placeholder="Actividad (ej: Fútbol)" required>
+        <div class="card-socio" style="border: 1px solid #00b4d8; background: rgba(0, 180, 216, 0.05);">
+            <h4 class="text-white mb-3" style="font-family:'Teko'; color: #00b4d8; font-size: 1.8rem;">📅 NUEVA FECHA</h4>
+            <form id="formTurno" class="row g-3">
+                <div class="col-12 col-md-5">
+                    <label>Actividad</label>
+                    <input type="text" id="inputActividad" class="form-input-dark" placeholder="Ej: Funcional, Fútbol..." required>
                 </div>
-                <div class="col-6">
+                <div class="col-6 col-md-3">
+                    <label>Fecha</label>
                     <input type="date" id="inputFecha" class="form-input-dark" required>
                 </div>
-                <div class="col-3">
+                <div class="col-6 col-md-2">
+                    <label>Hora</label>
                     <input type="time" id="inputHora" class="form-input-dark" required>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-2">
+                    <label>Cupo</label>
                     <input type="number" id="inputCupo" class="form-input-dark text-center" value="12" required>
                 </div>
-                <div class="col-12 mt-2">
-                    <button type="submit" id="btnCrearTurno" class="btn-save">HABILITAR</button>
+                <div class="col-12 mt-3">
+                    <button type="submit" id="btnCrearTurno" class="btn-save">HABILITAR TURNO</button>
                 </div>
             </form>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="m-0">CLASES ACTIVAS</h2>
-            <button onclick="cargarTurnosAdmin()" class="btn btn-outline-info btn-sm">↻</button>
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+            <h2 class="m-0" style="font-size: 2rem;">CLASES ACTIVAS</h2>
+            <button onclick="cargarTurnosAdmin()" class="btn btn-outline-info p-2" style="font-size: 1.2rem;">↻ Actualizar</button>
         </div>
-        <div id="listaTurnosAdmin" class="mb-5 text-center text-secondary">Cargando...</div>
+        
+        <div id="listaTurnosAdmin" class="row g-3">
+            <div class="col-12 text-center text-secondary py-5">Cargando clases...</div>
+        </div>
 
-        <hr class="border-secondary my-4">
+        <hr class="border-secondary my-5">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="m-0">LISTA DE SOCIOS</h2>
-            <button onclick="cargarUsuarios()" class="btn btn-outline-info btn-sm">↻</button>
+            <h2 class="m-0" style="font-size: 2rem;">LISTA DE SOCIOS</h2>
+            <button onclick="cargarUsuarios()" class="btn btn-outline-info p-2" style="font-size: 1.2rem;">↻ Actualizar</button>
         </div>
-        <div id="listaSocios" class="text-center text-secondary">Cargando...</div>
+
+        <div id="listaSocios" class="row g-3 pb-5">
+            <div class="col-12 text-center text-secondary py-5">Cargando socios...</div>
+        </div>
 
     </div>
 
     <script type="module">
+        // SEGURIDAD
         const rol = localStorage.getItem("rolUsuario");
         if (rol !== "ADMIN") window.location.href = "login.html";
 
@@ -142,44 +175,66 @@
         window.usuariosCache = [];
         window.turnosCache = [];
 
-        // --- FUNCIONES ---
+        // 1. CREAR TURNO
         document.getElementById('formTurno').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnCrearTurno');
-            btn.innerText = "..."; btn.disabled = true;
-            
-            await crearTurno(
+            btn.innerText = "GUARDANDO..."; btn.disabled = true;
+
+            const exito = await crearTurno(
                 document.getElementById('inputFecha').value,
                 document.getElementById('inputHora').value,
                 document.getElementById('inputActividad').value,
                 document.getElementById('inputCupo').value
             );
-            
-            alert("Turno Creado");
-            document.getElementById('formTurno').reset();
-            cargarTurnosAdmin();
-            btn.innerText = "HABILITAR"; btn.disabled = false;
+
+            if (exito) {
+                alert("✅ Turno creado correctamente");
+                document.getElementById('formTurno').reset();
+                cargarTurnosAdmin();
+            } else {
+                alert("❌ Error al crear turno");
+            }
+            btn.innerText = "HABILITAR TURNO"; btn.disabled = false;
         });
 
+        // 2. CARGAR TURNOS (GRID RESPONSIVE)
         window.cargarTurnosAdmin = async function() {
             const container = document.getElementById('listaTurnosAdmin');
             const turnos = await obtenerTurnos();
             window.turnosCache = turnos;
             container.innerHTML = "";
-            
-            if(turnos.length === 0) { container.innerHTML = "No hay clases."; return; }
+
+            if (turnos.length === 0) {
+                container.innerHTML = "<div class='col-12 text-center text-muted'>No hay clases programadas.</div>";
+                return;
+            }
 
             turnos.forEach((t, i) => {
-                const dia = new Date(t.fecha).toLocaleDateString('es-AR', {day:'numeric', month:'short'});
+                const fecha = new Date(t.fecha).toLocaleDateString('es-AR', {weekday: 'short', day:'numeric', month:'short'});
+                
+                // Usamos col-md-6 para PC (2 columnas) y col-12 para móvil (1 columna)
                 container.innerHTML += `
-                <div class="card-turno">
-                    <div class="d-flex justify-content-between">
-                        <div><h5 class="m-0">${t.actividad}</h5><small class="text-info">${dia} | ${t.hora}</small></div>
-                        <div class="bg-dark p-2 rounded border border-secondary fw-bold">${t.ocupados}/${t.cupo}</div>
-                    </div>
-                    <div class="row mt-2 g-2">
-                        <div class="col-8"><button onclick="verInscritos(${i})" class="btn-view">VER ALUMNOS</button></div>
-                        <div class="col-4"><button onclick="borrarClase('${t.id}')" class="btn-delete">🗑</button></div>
+                <div class="col-12 col-md-6">
+                    <div class="card-turno h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h4 class="m-0 fw-bold text-uppercase text-white">${t.actividad}</h4>
+                                <div class="text-info fs-5 mt-1">📅 ${fecha} | ⏰ ${t.hora}</div>
+                            </div>
+                            <div class="bg-dark p-2 rounded border border-secondary text-center">
+                                <div class="fw-bold fs-4 text-white" style="line-height:1">${t.ocupados}/${t.cupo}</div>
+                                <small style="font-size:0.7rem; color:#aaa">CUPOS</small>
+                            </div>
+                        </div>
+                        <div class="row mt-4 g-2">
+                            <div class="col-8">
+                                <button onclick="verInscritos(${i})" class="btn-view">👥 VER ALUMNOS</button>
+                            </div>
+                            <div class="col-4">
+                                <button onclick="borrarClase('${t.id}')" class="btn-delete">🗑 ELIMINAR</button>
+                            </div>
+                        </div>
                     </div>
                 </div>`;
             });
@@ -187,54 +242,84 @@
 
         window.verInscritos = (i) => {
             const t = window.turnosCache[i];
-            alert(t.inscritos_nombres?.length ? "ALUMNOS:\n- " + t.inscritos_nombres.join("\n- ") : "Nadie inscrito.");
+            alert(t.inscritos_nombres?.length ? "ALUMNOS INSCRITOS:\n\n- " + t.inscritos_nombres.join("\n- ") : "No hay alumnos inscritos todavía.");
         };
 
         window.borrarClase = async (id) => {
-            if(confirm("¿Borrar clase?")) { await eliminarTurno(id); cargarTurnosAdmin(); }
+            if(confirm("¿Estás seguro de ELIMINAR esta clase? Se borrará para siempre.")) {
+                await eliminarTurno(id);
+                cargarTurnosAdmin();
+            }
         };
 
+        // 3. CARGAR SOCIOS (GRID RESPONSIVE)
         window.cargarUsuarios = async function() {
             const container = document.getElementById('listaSocios');
             const users = await obtenerTodosLosUsuarios();
             window.usuariosCache = users;
             container.innerHTML = "";
-            
+
+            if (users.length === 0) {
+                container.innerHTML = "<div class='col-12 text-center text-muted'>No hay socios registrados.</div>";
+                return;
+            }
+
             users.forEach((u, i) => {
                 const esAlDia = u.estado === 'AL DIA';
+                
+                // Diseño de tarjeta ancha para mejor lectura
                 container.innerHTML += `
-                <div class="card-socio">
-                    <div class="d-flex justify-content-between mb-2">
-                        <h6 class="m-0 text-truncate">${u.nombre}</h6>
-                        <span class="badge bg-dark border border-secondary">${u.telefono}</span>
-                    </div>
-                    <div class="row g-2 align-items-end">
-                        <div class="col-5">
-                            <select id="estado-${i}" class="form-select-dark p-1">
-                                <option value="AL DIA" ${esAlDia?'selected':''}>AL DÍA 🟢</option>
-                                <option value="PENDIENTE" ${!esAlDia?'selected':''}>DEBE 🔴</option>
-                            </select>
+                <div class="col-12 col-md-6">
+                    <div class="card-socio h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="m-0 fw-bold text-white text-truncate" style="max-width: 70%;">${u.nombre}</h5>
+                            <span class="badge bg-dark border border-secondary p-2">${u.telefono}</span>
                         </div>
-                        <div class="col-3"><input type="number" id="clases-${i}" class="form-input-dark text-center p-1" value="${u.clases}"></div>
-                        <div class="col-2"><button onclick="guardar(${i})" class="btn-save p-1">💾</button></div>
-                        <div class="col-2"><button onclick="borrar(${i})" class="btn-delete p-1">🗑</button></div>
+                        
+                        <div class="row g-2 align-items-center">
+                            <div class="col-5">
+                                <label>Estado</label>
+                                <select id="estado-${i}" class="form-select-dark">
+                                    <option value="AL DIA" ${esAlDia?'selected':''}>🟢 AL DÍA</option>
+                                    <option value="PENDIENTE" ${!esAlDia?'selected':''}>🔴 DEBE</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <label>Clases</label>
+                                <input type="number" id="clases-${i}" class="form-input-dark text-center" value="${u.clases}">
+                            </div>
+                            <div class="col-4 d-flex gap-2 align-items-end">
+                                <button onclick="guardar(${i})" class="btn-save p-2" title="Guardar">💾</button>
+                                <button onclick="borrar(${i})" class="btn-delete p-2" title="Borrar">🗑</button>
+                            </div>
+                        </div>
                     </div>
                 </div>`;
             });
         };
 
         window.guardar = async (i) => {
-            await actualizarUsuario(window.usuariosCache[i].email, document.getElementById(`estado-${i}`).value, document.getElementById(`clases-${i}`).value);
-            alert("Guardado");
+            const u = window.usuariosCache[i];
+            const estado = document.getElementById(`estado-${i}`).value;
+            const clases = document.getElementById(`clases-${i}`).value;
+            
+            await actualizarUsuario(u.email, estado, clases);
+            alert("✅ Cambios guardados para " + u.nombre);
         };
 
         window.borrar = async (i) => {
-            if(confirm("¿Eliminar usuario?")) { await eliminarUsuario(window.usuariosCache[i].email); cargarUsuarios(); }
+            if(confirm("⚠ ¿ELIMINAR SOCIO?\n\nSe borrará: " + window.usuariosCache[i].nombre)) {
+                await eliminarUsuario(window.usuariosCache[i].email);
+                cargarUsuarios();
+            }
         };
 
-        document.getElementById('btnSalir').onclick = () => { localStorage.removeItem("rolUsuario"); location.href="login.html"; };
+        document.getElementById('btnSalir').onclick = () => {
+            localStorage.removeItem("rolUsuario");
+            location.href="login.html";
+        };
 
-        // INIT
+        // INICIALIZAR
         cargarTurnosAdmin();
         cargarUsuarios();
     </script>
