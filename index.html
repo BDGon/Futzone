@@ -87,32 +87,7 @@
             margin-top: -5px;
         }
 
-        /* BOTÓN SOCIOS */
-        .btn-socios {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            background: transparent;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.5);
-            padding: 5px 15px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-decoration: none;
-            clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
-            transition: 0.3s;
-            z-index: 1000; /* Asegura que esté siempre clickeable */
-        }
-
-        .btn-socios:hover {
-            background: var(--futzone-blue);
-            border-color: var(--futzone-blue);
-            color: var(--futzone-dark);
-        }
-
-        /* --- UTILIDADES --- */
-        /* Agregada para que funcione la clase en el HTML */
+        /* UTILIDADES */
         .text-shadow {
             text-shadow: 0 4px 10px rgba(0,0,0,0.8);
         }
@@ -182,53 +157,39 @@
         /* MÓVIL */
         @media (max-width: 768px) {
             .brand-title { font-size: 2.5rem; }
-            .btn-socios {
-                font-size: 1rem;
-                padding: 4px 10px;
-                right: 15px;
-                top: 25px;
-            }
         }
-                /* --- CORRECCIÓN PARA PC / ESCRITORIO --- */
+
+        /* --- CORRECCIÓN DEFINITIVA PARA PC (ESTA ES LA VERSIÓN CORRECTA) --- */
         @media (min-width: 768px) {
+            /* 1. Fondo negro para toda la pantalla */
+            html {
+                background-color: #050505; 
+            }
+
+            /* 2. El cuerpo se comporta como un celular centrado */
             body {
-                background-color: #0b0f19; /* Fondo muy oscuro para los bordes */
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 100vh;
-                margin: 0;
+                max-width: 480px;          
+                margin: 0 auto;            
+                min-height: 100vh;         
+                background-color: transparent; /* Transparente para ver el video */
+                box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                position: relative; 
             }
 
-            .container {
-                max-width: 480px; /* Forzamos ancho de celular */
-                width: 100%;
-                background-color: var(--futzone-dark); /* Color original de la app */
-                padding: 30px;
-                border-radius: 24px; /* Bordes redondeados estilo iPhone */
-                border: 1px solid #374151;
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5); /* Sombra elegante */
-                margin: auto;
-            }
-
-            /* Hacemos los textos un pelín más grandes en PC para leer mejor */
-            body, button, input, select {
-                font-size: 1.1rem; 
-            }
-            
-            /* Ajuste para que el Navbar no se estire de punta a punta */
+            /* 3. Ajustamos el navbar al ancho del "celular" */
             .navbar {
-                position: absolute;
-                top: 0;
-                width: 100%;
                 max-width: 480px;
-                border-radius: 0 0 24px 24px;
                 left: 50%;
                 transform: translateX(-50%);
+                width: 100%;
+                position: fixed; /* Mantenemos fixed */
             }
-            
-            /* Corrección para que el contenido no quede tapado por el navbar en PC */
-            body { padding-top: 80px; padding-bottom: 20px;}
+
+            /* 4. Ajustamos textos gigantes para que entren en 480px */
+            .hero-title-top { font-size: 4rem; }
+            .hero-title-bottom { font-size: 3.5rem; }
         }
 
     </style>
@@ -239,7 +200,7 @@
         <source src="res/video_fondo.mp4" type="video/mp4">
     </video>
 
-    <nav class="navbar w-100" style="padding: 20px 0; position: absolute; top: 0; left: 0; z-index: 100;">
+    <nav class="navbar w-100">
         <div class="container-fluid d-flex justify-content-center align-items-center position-relative">
             
             <a href="login.html" style="position: absolute; left: 20px; z-index: 1000; text-decoration:none; color:#ef4444; border: 1px solid #ef4444; padding: 4px 10px; font-family:'Teko'; font-size: 1.1rem; letter-spacing: 1px; border-radius: 4px; background: rgba(0,0,0,0.2);">
@@ -248,13 +209,9 @@
 
             <div class="brand-logo text-center" style="z-index: 1;">
                 <div class="brand-title" style="display: flex; align-items: center; justify-content: center; font-family: 'Teko'; font-weight: 700; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.8);">
-                    
                     <span style="color:#00b4d8; font-size: 3rem; line-height: 1;">FUT</span>
-                    
                     <span style="color:white; font-size: 5.5rem; line-height: 0.8; margin: 0 5px; transform: translateY(5px);">Z</span>
-                    
                     <span style="color:#00b4d8; font-size: 3rem; line-height: 1;">ONE</span>
-                
                 </div>
                 <div class="brand-subtitle" style="font-size: 0.75rem; letter-spacing: 4px; color: #cbd5e1; text-transform: uppercase; margin-top: 10px; font-weight: 600;">
                     CENTRO DE ENTRENAMIENTO
@@ -283,7 +240,7 @@
     <section class="section-content">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="glass-card text-center">
                         <h2 class="display-4 fw-bold mb-3 text-shadow">ALTO RENDIMIENTO</h2>
                         <p class="fs-5 mb-4">
@@ -303,7 +260,7 @@
     <section class="section-content" style="min-height: 60vh;">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="glass-card text-center">
                         <h2 class="mb-4">¿ESTÁS LISTO?</h2>
                         
