@@ -8,14 +8,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Teko:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
+        :root { --futzone-blue: #00b4d8; --futzone-dark: #111827; }
+
         body {
-            background-color: #111827; /* Dark */
+            background-color: var(--futzone-dark); 
             color: white;
             font-family: 'Inter', sans-serif;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0;
         }
         
         h2 { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
@@ -25,7 +28,7 @@
             border: 1px solid #374151;
             border-radius: 16px;
             padding: 2rem;
-            width: 100%;
+            width: 90%; /* Mejor ajuste en móviles */
             max-width: 400px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
@@ -39,6 +42,7 @@
             background: #4b5563;
             color: white;
             border-color: #00b4d8;
+            outline: none;
             box-shadow: 0 0 0 0.25rem rgba(0, 180, 216, 0.25);
         }
 
@@ -51,51 +55,37 @@
             width: 100%;
             border: none;
             clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
+            transition: 0.3s;
+        }
+        .btn-register:hover {
+            background-color: #029aba;
         }
         
         .link-login { color: #00b4d8; text-decoration: none; font-weight: 600; }
-         /* --- CORRECCIÓN PARA PC / ESCRITORIO --- */
+
+        /* --- CORRECCIÓN DEFINITIVA PARA PC (VERSIÓN REGISTRO) --- */
         @media (min-width: 768px) {
+            /* 1. Fondo negro para PC */
+            html {
+                background-color: #050505; 
+            }
+
+            /* 2. Cuerpo centrado como celular */
             body {
-                background-color: #0b0f19; /* Fondo muy oscuro para los bordes */
+                max-width: 480px;          
+                margin: 0 auto;            
+                min-height: 100vh;
+                background-color: #111827; 
+                box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                
+                /* Centrado vertical del formulario */
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                min-height: 100vh;
-                margin: 0;
             }
-
-            .container {
-                max-width: 480px; /* Forzamos ancho de celular */
-                width: 100%;
-                background-color: var(--futzone-dark); /* Color original de la app */
-                padding: 30px;
-                border-radius: 24px; /* Bordes redondeados estilo iPhone */
-                border: 1px solid #374151;
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5); /* Sombra elegante */
-                margin: auto;
-            }
-
-            /* Hacemos los textos un pelín más grandes en PC para leer mejor */
-            body, button, input, select {
-                font-size: 1.1rem; 
-            }
-            
-            /* Ajuste para que el Navbar no se estire de punta a punta */
-            .navbar {
-                position: absolute;
-                top: 0;
-                width: 100%;
-                max-width: 480px;
-                border-radius: 0 0 24px 24px;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            
-            /* Corrección para que el contenido no quede tapado por el navbar en PC */
-            body { padding-top: 80px; padding-bottom: 20px;}
         }
-
     </style>
 </head>
 <body>
@@ -140,7 +130,6 @@
     </div>
 
     <script type="module">
-        // Importamos Firebase y nuestra función del Excel
         import { auth } from './js/firebase-config.js';
         import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { guardarEnExcel } from './js/sheet-api.js';
@@ -152,28 +141,25 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // 1. Efecto de "Cargando..."
             const originalText = btn.innerText;
             btn.innerText = "PROCESANDO...";
             btn.disabled = true;
             msg.classList.add('d-none');
 
-            // 2. Obtener datos
             const nombre = document.getElementById('nombre').value;
             const telefono = document.getElementById('telefono').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
-                // 3. Crear usuario en Firebase (Autenticación)
+                // 1. Crear en Firebase
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                console.log("Usuario creado en Firebase:", userCredential.user.uid);
-
-                // 4. Guardar en el Excel del Cliente (Base de Datos)
+                
+                // 2. Guardar en Excel
                 btn.innerText = "GUARDANDO DATOS...";
                 await guardarEnExcel(nombre, email, telefono);
 
-                // 5. ¡Éxito! Redirigir al panel
+                // 3. Éxito
                 alert("¡Cuenta creada con éxito! Bienvenido a FUTZONE.");
                 window.location.href = "dashboard.html";
 
@@ -186,7 +172,6 @@
                 msg.innerText = mensaje;
                 msg.classList.remove('d-none');
                 
-                // Restaurar botón
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
