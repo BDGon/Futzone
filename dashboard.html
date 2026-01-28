@@ -10,7 +10,7 @@
     <style>
         :root { --futzone-blue: #00b4d8; --futzone-dark: #111827; }
         body { background-color: var(--futzone-dark); color: white; font-family: 'Inter', sans-serif; padding-bottom: 80px; }
-        h1, h2, h3, .btn-font { font-family: 'Teko', sans-serif; text-transform: uppercase; }
+        h1, h2, h3, .btn-font, .modal-title { font-family: 'Teko', sans-serif; text-transform: uppercase; }
 
         /* Tarjeta de Clases Disponibles */
         .card-info {
@@ -41,6 +41,15 @@
             padding: 5px 15px; clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
         }
         .btn-reservar:disabled { background-color: #4b5563; color: #9ca3af; cursor: not-allowed; }
+
+        /* Estilo del Modal (Cartel de Aviso) */
+        .modal-content {
+            background-color: #1f2937;
+            border: 1px solid var(--futzone-blue);
+            color: white;
+        }
+        .modal-header { border-bottom: 1px solid #374151; }
+        .btn-close-white { filter: invert(1); } /* X blanca */
     </style>
 </head>
 <body>
@@ -76,6 +85,25 @@
 
     </div>
 
+    <div class="modal fade" id="modalAviso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-info">📢 INFORMACIÓN IMPORTANTE</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <p class="fs-5">Recuerda que a partir de <strong>febrero 2026</strong> la cuota mensual se pagará del <strong>1 al 10</strong> de cada mes.</p>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #374151;">
+                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">ENTENDIDO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script type="module">
         import { auth } from './js/firebase-config.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -90,10 +118,25 @@
                 userEmail = user.email;
                 await cargarDatosUsuario(userEmail);
                 await cargarTurnos(userEmail);
+
+                // MOSTRAR AVISO (Una vez por sesión)
+                mostrarAviso();
+
             } else {
                 window.location.href = "login.html";
             }
         });
+
+        // FUNCIÓN PARA MOSTRAR EL AVISO
+        function mostrarAviso() {
+            // Usamos sessionStorage para que no le aparezca cada vez que recarga la página,
+            // sino solo cuando entra de nuevo a la app.
+            if (!sessionStorage.getItem('avisoVisto')) {
+                const modal = new bootstrap.Modal(document.getElementById('modalAviso'));
+                modal.show();
+                sessionStorage.setItem('avisoVisto', 'true'); // Marcamos como visto
+            }
+        }
 
         // 2. CARGAR INFO DEL USUARIO (CLASES)
         async function cargarDatosUsuario(email) {
@@ -136,7 +179,6 @@
                 } else if (turno.ocupados >= turno.cupo) {
                     btnHtml = `<button class="btn btn-secondary w-100" disabled>LLENO ⛔</button>`;
                 } else {
-                    // Botón de Reservar Activo
                     btnHtml = `<button onclick="confirmarReserva('${turno.id}', '${turno.actividad}', '${turno.hora}')" class="btn-reservar w-100">RESERVAR LUGAR</button>`;
                 }
 
@@ -170,22 +212,22 @@
 
             if (!confirm(`¿Confirmar reserva para ${actividad} a las ${hora}? Se descontará 1 clase.`)) return;
 
-            // Feedback visual simple
             alert("Procesando reserva... Por favor espera.");
-
             const exito = await reservarTurno(userEmail, idTurno);
 
             if (exito) {
                 alert("✅ ¡Reserva Exitosa!");
-                location.reload(); // Recargar para actualizar clases y lista
+                location.reload(); 
             } else {
-                alert("❌ Ocurrió un error. Intenta nuevamente (Puede que el cupo se haya llenado).");
+                alert("❌ Ocurrió un error (Quizás se llenó el cupo). Intenta nuevamente.");
                 location.reload();
             }
         };
 
         // SALIR
         document.getElementById('btnSalir').addEventListener('click', () => {
+            // Limpiamos la sesión para que si vuelve a entrar, vea el aviso de nuevo
+            sessionStorage.removeItem('avisoVisto'); 
             signOut(auth).then(() => window.location.href = "login.html");
         });
     </script>
