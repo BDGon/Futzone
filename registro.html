@@ -14,11 +14,12 @@
             background-color: var(--futzone-dark); 
             color: white;
             font-family: 'Inter', sans-serif;
-            height: 100vh;
+            margin: 0;
+            /* Centrado vertical para móvil también */
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
         }
         
         h2 { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
@@ -28,7 +29,7 @@
             border: 1px solid #374151;
             border-radius: 16px;
             padding: 2rem;
-            width: 90%; /* Mejor ajuste en móviles */
+            width: 90%; 
             max-width: 400px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
@@ -43,7 +44,6 @@
             color: white;
             border-color: #00b4d8;
             outline: none;
-            box-shadow: 0 0 0 0.25rem rgba(0, 180, 216, 0.25);
         }
 
         .btn-register {
@@ -57,33 +57,20 @@
             clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
             transition: 0.3s;
         }
-        .btn-register:hover {
-            background-color: #029aba;
-        }
+        .btn-register:hover { background-color: #029aba; }
         
         .link-login { color: #00b4d8; text-decoration: none; font-weight: 600; }
 
-        /* --- CORRECCIÓN DEFINITIVA PARA PC (VERSIÓN REGISTRO) --- */
+        /* --- MODO APP EN PC (CONTENEDOR) --- */
         @media (min-width: 768px) {
-            /* 1. Fondo negro para PC */
-            html {
-                background-color: #050505; 
-            }
-
-            /* 2. Cuerpo centrado como celular */
+            html { background-color: #050505; }
             body {
                 max-width: 480px;          
                 margin: 0 auto;            
-                min-height: 100vh;
                 background-color: #111827; 
-                box-shadow: 0 0 50px rgba(0,0,0,0.8); 
                 border-left: 1px solid #333;
                 border-right: 1px solid #333;
-                
-                /* Centrado vertical del formulario */
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                /* El display flex del body se encarga de centrar la tarjeta verticalmente */
             }
         }
     </style>
@@ -142,38 +129,35 @@
             e.preventDefault();
             
             const originalText = btn.innerText;
-            btn.innerText = "PROCESANDO...";
-            btn.disabled = true;
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
             msg.classList.add('d-none');
 
             const nombre = document.getElementById('nombre').value;
             const telefono = document.getElementById('telefono').value;
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const pass = document.getElementById('password').value;
 
             try {
                 // 1. Crear en Firebase
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await createUserWithEmailAndPassword(auth, email, pass);
                 
                 // 2. Guardar en Excel
                 btn.innerText = "GUARDANDO DATOS...";
                 await guardarEnExcel(nombre, email, telefono);
 
                 // 3. Éxito
-                alert("¡Cuenta creada con éxito! Bienvenido a FUTZONE.");
+                alert("¡Cuenta creada! Bienvenido.");
                 window.location.href = "dashboard.html";
 
             } catch (error) {
                 console.error(error);
-                let mensaje = "Error al crear cuenta: " + error.message;
-                if (error.code === 'auth/email-already-in-use') mensaje = "Ese email ya está registrado.";
-                if (error.code === 'auth/weak-password') mensaje = "La contraseña debe tener al menos 6 caracteres.";
+                let mensaje = "Error al crear cuenta.";
+                if (error.code === 'auth/email-already-in-use') mensaje = "Email ya registrado.";
+                if (error.code === 'auth/weak-password') mensaje = "Contraseña muy corta (mínimo 6).";
                 
                 msg.innerText = mensaje;
                 msg.classList.remove('d-none');
-                
-                btn.innerText = originalText;
-                btn.disabled = false;
+                btn.innerText = originalText; btn.disabled = false;
             }
         });
     </script>
