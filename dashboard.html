@@ -9,73 +9,38 @@
     
     <style>
         :root { --futzone-blue: #00b4d8; --futzone-dark: #111827; }
-        body { background-color: var(--futzone-dark); color: white; font-family: 'Inter', sans-serif; padding-bottom: 80px; }
-        h1, h2, h3, .btn-font, .modal-title { font-family: 'Teko', sans-serif; text-transform: uppercase; }
+        body { background-color: var(--futzone-dark); color: white; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 80px;}
+        h1, h2, h3, .modal-title { font-family: 'Teko', sans-serif; text-transform: uppercase; }
 
-        /* Tarjeta de Clases Disponibles */
         .card-info {
             background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border: 1px solid #374151;
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,180,216, 0.1);
+            border: 1px solid #374151; border-radius: 16px; padding: 20px; text-align: center;
         }
-
-        /* Tarjeta de Turno */
         .card-turno {
-            background-color: #1f2937;
-            border-left: 5px solid var(--futzone-blue);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
+            background-color: #1f2937; border-left: 5px solid var(--futzone-blue);
+            border-radius: 8px; padding: 15px; margin-bottom: 15px;
         }
-        .actividad-title { font-size: 1.5rem; font-weight: bold; font-family: 'Teko'; color: white; line-height: 1; }
-        .turno-meta { font-size: 0.9rem; color: #9ca3af; }
-        
-        /* Botón Reservar */
         .btn-reservar {
-            background-color: var(--futzone-blue); color: #111827; 
-            border: none; font-weight: bold; font-family: 'Teko'; font-size: 1.1rem;
-            padding: 5px 15px; clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+            background-color: var(--futzone-blue); color: #111827; border: none; font-weight: bold;
+            font-family: 'Teko'; font-size: 1.1rem; padding: 5px 15px; width: 100%;
+            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
         }
-        .btn-reservar:disabled { background-color: #4b5563; color: #9ca3af; cursor: not-allowed; }
+        
+        /* MODAL */
+        .modal-content { background-color: #1f2937; border: 1px solid var(--futzone-blue); color: white; }
+        .btn-close-white { filter: invert(1); }
 
-        /* Estilo del Modal (Cartel de Aviso) */
-        .modal-content {
-            background-color: #1f2937;
-            border: 1px solid var(--futzone-blue);
-            color: white;
-        }
-        .modal-header { border-bottom: 1px solid #374151; }
-        .btn-close-white { filter: invert(1); } /* X blanca */
-
-        /* --- CORRECCIÓN DEFINITIVA PARA PC (VERSIÓN CORRECTA) --- */
+        /* --- MODO APP EN PC --- */
         @media (min-width: 768px) {
-            html {
-                background-color: #050505; 
-            }
+            html { background-color: #050505; }
             body {
-                max-width: 480px;          /* Ancho máximo de celular */
-                margin: 0 auto;            /* Centrado automático */
-                min-height: 100vh;         /* Altura completa */
-                background-color: #111827; /* Color de fondo de tu app */
-                box-shadow: 0 0 50px rgba(0,0,0,0.8); /* Sombra para resaltar */
-                border-left: 1px solid #333;
-                border-right: 1px solid #333;
-                position: relative; 
+                max-width: 480px; margin: 0 auto; min-height: 100vh;
+                background-color: #111827; border-left: 1px solid #333; border-right: 1px solid #333;
+                position: relative;
             }
-            .navbar {
-                max-width: 480px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 100%;
-            }
-            .modal-dialog {
-                max-width: 440px;
-                margin: 1.75rem auto;
-            }
+            .navbar { max-width: 480px; left: 50%; transform: translateX(-50%); width: 100%; position: fixed; }
+            .container { padding-top: 80px; }
+            .modal-dialog { max-width: 440px; margin: 1.75rem auto; }
         }
     </style>
 </head>
@@ -89,48 +54,35 @@
     </nav>
 
     <div class="container">
-        
         <div class="mb-4">
             <h2 class="mb-3">HOLA, <span id="txtNombre" class="text-info">SOCIO</span></h2>
-            
             <div class="card-info">
-                <small class="text-secondary text-uppercase tracking-wider">Tus Clases Disponibles</small>
+                <small class="text-secondary text-uppercase">Tus Clases Disponibles</small>
                 <div id="txtClases" class="display-1 fw-bold text-white my-2">-</div>
                 <div id="txtEstado" class="badge bg-secondary">Cargando...</div>
             </div>
         </div>
-
         <hr class="border-secondary my-4">
-
         <h3 class="mb-3">📅 PRÓXIMAS CLASES</h3>
-        <div id="listaTurnos">
-            <div class="text-center text-secondary py-5">
-                <div class="spinner-border text-info mb-2"></div>
-                <p>Buscando horarios...</p>
-            </div>
-        </div>
-
+        <div id="listaTurnos" class="text-center text-secondary">Buscando horarios...</div>
     </div>
 
-    <div class="modal fade" id="modalAviso" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="modalAviso" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-info">📢 INFORMACIÓN IMPORTANTE</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title text-info">📢 INFORMACIÓN</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center py-4">
                     <p class="fs-5">Recuerda que a partir de <strong>febrero 2026</strong> la cuota mensual se pagará del <strong>1 al 10</strong> de cada mes.</p>
                 </div>
-                <div class="modal-footer" style="border-top: 1px solid #374151;">
-                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">ENTENDIDO</button>
-                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">ENTENDIDO</button></div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script type="module">
         import { auth } from './js/firebase-config.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -139,121 +91,64 @@
         let userEmail = "";
         let clasesDisponibles = 0;
 
-        // 1. VERIFICAR LOGIN Y CARGAR DATOS
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userEmail = user.email;
-                await cargarDatosUsuario(userEmail);
-                await cargarTurnos(userEmail);
-
-                // MOSTRAR AVISO (Una vez por sesión)
-                mostrarAviso();
-
-            } else {
-                window.location.href = "login.html";
-            }
+                cargarDatosUsuario(userEmail);
+                cargarTurnos(userEmail);
+                if (!sessionStorage.getItem('avisoVisto')) {
+                    new bootstrap.Modal(document.getElementById('modalAviso')).show();
+                    sessionStorage.setItem('avisoVisto', 'true');
+                }
+            } else { location.href = "login.html"; }
         });
 
-        // FUNCIÓN PARA MOSTRAR EL AVISO
-        function mostrarAviso() {
-            if (!sessionStorage.getItem('avisoVisto')) {
-                const modal = new bootstrap.Modal(document.getElementById('modalAviso'));
-                modal.show();
-                sessionStorage.setItem('avisoVisto', 'true'); 
-            }
-        }
-
-        // 2. CARGAR INFO DEL USUARIO (CLASES)
         async function cargarDatosUsuario(email) {
             const data = await consultarEstadoExcel(email);
-            
-            if (data && data.result === "success") {
-                const usuario = data.data;
-                document.getElementById('txtNombre').innerText = usuario.nombre.split(" ")[0]; // Solo primer nombre
-                
-                clasesDisponibles = parseInt(usuario.clases);
+            if (data?.result === "success") {
+                const u = data.data;
+                document.getElementById('txtNombre').innerText = u.nombre.split(" ")[0];
+                clasesDisponibles = parseInt(u.clases);
                 document.getElementById('txtClases').innerText = clasesDisponibles;
-                
-                const estadoEl = document.getElementById('txtEstado');
-                estadoEl.innerText = usuario.estado === "AL DIA" ? "HABILITADO" : "PAGO PENDIENTE";
-                estadoEl.className = usuario.estado === "AL DIA" ? "badge bg-success" : "badge bg-danger";
+                const est = document.getElementById('txtEstado');
+                est.innerText = u.estado === "AL DIA" ? "HABILITADO" : "PAGO PENDIENTE";
+                est.className = u.estado === "AL DIA" ? "badge bg-success" : "badge bg-danger";
             }
         }
 
-        // 3. CARGAR LISTA DE TURNOS
         async function cargarTurnos(email) {
             const container = document.getElementById('listaTurnos');
             const turnos = await obtenerTurnos(email);
+            container.innerHTML = "";
+            if (turnos.length === 0) return container.innerHTML = "No hay clases programadas.";
 
-            container.innerHTML = ""; 
+            turnos.forEach(t => {
+                const dia = new Date(t.fecha).toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'short'});
+                let btn = `<button onclick="reservar('${t.id}','${t.actividad}','${t.hora}')" class="btn-reservar">RESERVAR</button>`;
+                if (t.yaInscrito) btn = `<button class="btn btn-success w-100" disabled>YA ESTÁS ANOTADO</button>`;
+                else if (t.ocupados >= t.cupo) btn = `<button class="btn btn-secondary w-100" disabled>LLENO</button>`;
 
-            if (turnos.length === 0) {
-                container.innerHTML = '<div class="alert alert-dark text-center">No hay clases programadas pronto.</div>';
-                return;
-            }
-
-            turnos.forEach(turno => {
-                // Formatear fecha
-                const fechaObj = new Date(turno.fecha);
-                const dia = fechaObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' });
-                
-                // Lógica del botón
-                let btnHtml = "";
-                if (turno.yaInscrito) {
-                    btnHtml = `<button class="btn btn-success w-100" disabled>YA ESTÁS ANOTADO ✔</button>`;
-                } else if (turno.ocupados >= turno.cupo) {
-                    btnHtml = `<button class="btn btn-secondary w-100" disabled>LLENO ⛔</button>`;
-                } else {
-                    btnHtml = `<button onclick="confirmarReserva('${turno.id}', '${turno.actividad}', '${turno.hora}')" class="btn-reservar w-100">RESERVAR LUGAR</button>`;
-                }
-
-                const card = `
-                    <div class="card-turno">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <div class="actividad-title text-uppercase">${turno.actividad}</div>
-                                <div class="turno-meta text-info">📅 ${dia} | ⏰ ${turno.hora} hs</div>
-                            </div>
-                            <div class="text-center bg-dark p-2 rounded border border-secondary">
-                                <div class="fw-bold fs-5">${turno.cupo - turno.ocupados}</div>
-                                <small style="font-size:0.6rem; color:#9ca3af;">LIBRES</small>
-                            </div>
-                        </div>
-                        <div class="mt-2">
-                            ${btnHtml}
+                container.innerHTML += `
+                <div class="card-turno">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div><div class="fw-bold fs-4 text-uppercase" style="font-family:'Teko'">${t.actividad}</div><div class="text-info">${dia} | ${t.hora} hs</div></div>
+                        <div class="text-center bg-dark p-2 rounded border border-secondary">
+                            <div class="fw-bold">${t.cupo - t.ocupados}</div><small style="font-size:0.6rem">LIBRES</small>
                         </div>
                     </div>
-                `;
-                container.innerHTML += card;
+                    ${btn}
+                </div>`;
             });
         }
 
-        // 4. FUNCIÓN GLOBAL PARA EL CLICK DEL BOTÓN
-        window.confirmarReserva = async function(idTurno, actividad, hora) {
-            if (clasesDisponibles <= 0) {
-                alert("⛔ No tienes clases disponibles. Contacta a administración.");
-                return;
-            }
-
-            if (!confirm(`¿Confirmar reserva para ${actividad} a las ${hora}? Se descontará 1 clase.`)) return;
-
-            alert("Procesando reserva... Por favor espera.");
-            const exito = await reservarTurno(userEmail, idTurno);
-
-            if (exito) {
-                alert("✅ ¡Reserva Exitosa!");
-                location.reload(); 
-            } else {
-                alert("❌ Ocurrió un error (Quizás se llenó el cupo). Intenta nuevamente.");
-                location.reload();
-            }
+        window.reservar = async (id, act, hora) => {
+            if (clasesDisponibles <= 0) return alert("Sin clases disponibles.");
+            if (!confirm(`¿Reservar ${act} a las ${hora}?`)) return;
+            alert(await reservarTurno(userEmail, id) ? "✅ Reserva Exitosa" : "❌ Error o Cupo Lleno");
+            location.reload();
         };
 
-        // SALIR
-        document.getElementById('btnSalir').addEventListener('click', () => {
-            sessionStorage.removeItem('avisoVisto'); 
-            signOut(auth).then(() => window.location.href = "login.html");
-        });
+        document.getElementById('btnSalir').onclick = () => { sessionStorage.removeItem('avisoVisto'); signOut(auth).then(()=> location.href="login.html"); };
     </script>
 </body>
 </html>
