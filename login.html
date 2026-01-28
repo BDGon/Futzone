@@ -9,103 +9,44 @@
     
     <style>
         :root { --futzone-blue: #00b4d8; --futzone-dark: #111827; }
-
         body {
-            background-color: var(--futzone-dark);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
+            background-color: var(--futzone-dark); color: white;
+            font-family: 'Inter', sans-serif; margin: 0;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
         }
         
         .card-login {
-            background: #1f2937;
-            border: 1px solid #374151;
-            border-radius: 16px;
-            padding: 2rem;
-            width: 90%; /* Ajuste para que no toque los bordes en móviles pequeños */
-            max-width: 400px;
+            background: #1f2937; border: 1px solid #374151; border-radius: 16px;
+            padding: 2rem; width: 90%; max-width: 400px;
         }
-
-        .form-control {
-            background: #374151;
-            border: 1px solid #4b5563;
-            color: white;
-        }
-        .form-control:focus {
-            background: #4b5563;
-            color: white;
-            border-color: #00b4d8;
-            outline: none;
-            box-shadow: 0 0 0 0.25rem rgba(0, 180, 216, 0.25);
-        }
-
+        .form-control { background: #374151; border: 1px solid #4b5563; color: white; }
+        .form-control:focus { background: #4b5563; color: white; border-color: #00b4d8; outline: none; }
         .btn-login {
-            background-color: #00b4d8;
-            color: #111827;
-            font-family: 'Teko', sans-serif;
-            font-size: 1.4rem;
-            width: 100%;
-            border: none;
-            clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
-            transition: 0.3s;
-        }
-        .btn-login:hover {
-            background-color: #029aba;
+            background-color: #00b4d8; color: #111827; font-family: 'Teko', sans-serif;
+            font-size: 1.4rem; width: 100%; border: none; clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
         }
 
-        /* --- CORRECCIÓN DEFINITIVA PARA PC (VERSIÓN LOGIN) --- */
+        /* --- MODO APP EN PC --- */
         @media (min-width: 768px) {
-            /* 1. Fondo negro para la pantalla de la PC */
-            html {
-                background-color: #050505; 
-            }
-
-            /* 2. El cuerpo se convierte en el "celular" */
+            html { background-color: #050505; }
             body {
-                max-width: 480px;          
-                margin: 0 auto;            
-                background-color: #111827; 
-                box-shadow: 0 0 50px rgba(0,0,0,0.8); 
-                border-left: 1px solid #333;
-                border-right: 1px solid #333;
-                /* Mantenemos el centrado vertical del login */
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
+                max-width: 480px; margin: 0 auto;
+                background-color: #111827; border-left: 1px solid #333; border-right: 1px solid #333;
             }
         }
     </style>
 </head>
 <body>
-
     <div class="card-login shadow">
         <div class="text-center mb-4">
             <h2 style="font-family: 'Teko'; font-size: 2.5rem;">ZONA <span style="color:#00b4d8">SOCIOS</span></h2>
         </div>
-
         <form id="loginForm">
-            <div class="mb-3">
-                <label class="small text-secondary">Email</label>
-                <input type="email" id="email" class="form-control" required>
-            </div>
-
-            <div class="mb-4">
-                <label class="small text-secondary">Contraseña</label>
-                <input type="password" id="password" class="form-control" required>
-            </div>
-
-            <button type="submit" id="btnLogin" class="btn btn-login mb-3">
-                INGRESAR
-            </button>
-            
+            <div class="mb-3"><label class="small text-secondary">Email</label><input type="email" id="email" class="form-control" required></div>
+            <div class="mb-4"><label class="small text-secondary">Contraseña</label><input type="password" id="password" class="form-control" required></div>
+            <button type="submit" id="btnLogin" class="btn btn-login mb-3">INGRESAR</button>
             <div id="msgError" class="alert alert-danger d-none text-center small"></div>
         </form>
-
         <div class="text-center">
             <small class="text-secondary">¿No tienes cuenta? <a href="registro.html" style="color:#00b4d8; text-decoration: none;">Regístrate aquí</a></small>
         </div>
@@ -114,52 +55,32 @@
     <script type="module">
         import { auth } from './js/firebase-config.js';
         import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        // --- CREDENCIALES ADMIN ---
+        
         const ADMIN_EMAIL = "admin@futzone.com";
         const ADMIN_PASS = "futzone2026"; 
-        // ---------------------------
 
-        const form = document.getElementById('loginForm');
-        const msg = document.getElementById('msgError');
-        const btn = document.getElementById('btnLogin');
-
-        form.addEventListener('submit', async (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            msg.classList.add('d-none');
-            btn.innerText = "VERIFICANDO...";
-            btn.disabled = true;
+            const msg = document.getElementById('msgError');
+            const btn = document.getElementById('btnLogin');
+            msg.classList.add('d-none'); btn.innerText = "..."; btn.disabled = true;
 
-            const email = document.getElementById('email').value.trim(); 
-            const password = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value.trim();
 
-            // 1. VERIFICAMOS SI ES ADMIN
-            if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
+            if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
                 localStorage.setItem("rolUsuario", "ADMIN");
-                window.location.href = "admin.html"; 
+                window.location.href = "admin.html";
                 return;
             }
 
-            // 2. SI NO, ES SOCIO (Firebase)
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                await signInWithEmailAndPassword(auth, email, pass);
                 localStorage.setItem("rolUsuario", "SOCIO");
-                window.location.href = "dashboard.html"; 
-
-            } catch (error) {
-                console.error(error);
-                btn.innerText = "INGRESAR";
-                btn.disabled = false;
-                
-                let textoError = "Error al iniciar sesión.";
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-                    textoError = "Datos incorrectos.";
-                } else if (error.code === 'auth/user-not-found') {
-                    textoError = "Usuario no encontrado.";
-                }
-                
-                msg.innerText = textoError;
-                msg.classList.remove('d-none');
+                window.location.href = "dashboard.html";
+            } catch (err) {
+                btn.innerText = "INGRESAR"; btn.disabled = false;
+                msg.innerText = "Datos incorrectos"; msg.classList.remove('d-none');
             }
         });
     </script>
