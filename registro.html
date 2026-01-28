@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Registro | FUTZONE</title>
     <link rel="stylesheet" href="res/bootstrap@5.2.0.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Teko:wght@500;700&display=swap" rel="stylesheet">
@@ -15,104 +15,96 @@
             color: white;
             font-family: 'Inter', sans-serif;
             margin: 0;
-            /* Centrado vertical para móvil también */
+            width: 100%;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px; /* Para que no toque bordes en móviles muy chicos */
         }
         
-        h2 { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
-
         .card-registro {
             background: #1f2937;
             border: 1px solid #374151;
-            border-radius: 16px;
-            padding: 2rem;
-            width: 90%; 
-            max-width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px; /* Un poco más ancho que el login */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
+
+        h2 { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 2.5rem; }
 
         .form-control {
             background: #374151;
             border: 1px solid #4b5563;
             color: white;
+            padding: 12px;
+            font-size: 1.1rem;
         }
         .form-control:focus {
             background: #4b5563;
             color: white;
             border-color: #00b4d8;
             outline: none;
+            box-shadow: none;
         }
 
         .btn-register {
             background-color: #00b4d8;
             color: #111827;
             font-family: 'Teko', sans-serif;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
             width: 100%;
             border: none;
+            padding: 10px;
             clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
             transition: 0.3s;
         }
         .btn-register:hover { background-color: #029aba; }
         
-        .link-login { color: #00b4d8; text-decoration: none; font-weight: 600; }
-
-        /* --- MODO APP EN PC (CONTENEDOR) --- */
-        @media (min-width: 768px) {
-            html { background-color: #050505; }
-            body {
-                max-width: 480px;          
-                margin: 0 auto;            
-                background-color: #111827; 
-                border-left: 1px solid #333;
-                border-right: 1px solid #333;
-                /* El display flex del body se encarga de centrar la tarjeta verticalmente */
-            }
-        }
+        a { color: var(--futzone-blue); text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div class="card-registro">
         <div class="text-center mb-4">
-            <h2 class="text-white">Crear Cuenta</h2>
-            <p class="text-secondary small">Únete a la comunidad FUTZONE</p>
+            <h2 class="text-white">CREAR CUENTA</h2>
+            <p class="text-secondary">Únete a la comunidad FUTZONE</p>
         </div>
 
         <form id="registroForm">
             <div class="mb-3">
-                <label class="form-label small text-secondary">Nombre Completo</label>
+                <label class="form-label text-secondary">Nombre Completo</label>
                 <input type="text" id="nombre" class="form-control" required placeholder="Ej: Lionel Messi">
             </div>
 
             <div class="mb-3">
-                <label class="form-label small text-secondary">Teléfono</label>
+                <label class="form-label text-secondary">Teléfono</label>
                 <input type="tel" id="telefono" class="form-control" required placeholder="Ej: 11 1234 5678">
             </div>
 
             <div class="mb-3">
-                <label class="form-label small text-secondary">Email</label>
+                <label class="form-label text-secondary">Email</label>
                 <input type="email" id="email" class="form-control" required placeholder="tu@email.com">
             </div>
 
             <div class="mb-4">
-                <label class="form-label small text-secondary">Contraseña</label>
+                <label class="form-label text-secondary">Contraseña</label>
                 <input type="password" id="password" class="form-control" required placeholder="Mínimo 6 caracteres">
             </div>
 
-            <button type="submit" id="btnSubmit" class="btn btn-register btn-lg mb-3">
+            <button type="submit" id="btnSubmit" class="btn btn-register btn-lg mb-4">
                 REGISTRARSE
             </button>
 
-            <div id="msgError" class="alert alert-danger d-none text-center small p-2"></div>
+            <div id="msgError" class="alert alert-danger d-none text-center"></div>
         </form>
 
-        <div class="text-center mt-2">
-            <small class="text-secondary">¿Ya tienes cuenta? <a href="login.html" class="link-login">Inicia Sesión</a></small>
+        <div class="text-center">
+            <p class="text-secondary">¿Ya tienes cuenta? <a href="login.html" class="fs-5">Inicia Sesión</a></p>
         </div>
     </div>
 
@@ -129,35 +121,38 @@
             e.preventDefault();
             
             const originalText = btn.innerText;
-            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
             msg.classList.add('d-none');
 
             const nombre = document.getElementById('nombre').value;
             const telefono = document.getElementById('telefono').value;
             const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
+            const password = document.getElementById('password').value;
 
             try {
-                // 1. Crear en Firebase
-                await createUserWithEmailAndPassword(auth, email, pass);
+                // 1. Firebase Auth
+                await createUserWithEmailAndPassword(auth, email, password);
                 
-                // 2. Guardar en Excel
-                btn.innerText = "GUARDANDO DATOS...";
+                // 2. Excel DB
+                btn.innerText = "GUARDANDO...";
                 await guardarEnExcel(nombre, email, telefono);
 
                 // 3. Éxito
-                alert("¡Cuenta creada! Bienvenido.");
+                alert("¡Bienvenido a FUTZONE!");
                 window.location.href = "dashboard.html";
 
             } catch (error) {
                 console.error(error);
                 let mensaje = "Error al crear cuenta.";
-                if (error.code === 'auth/email-already-in-use') mensaje = "Email ya registrado.";
-                if (error.code === 'auth/weak-password') mensaje = "Contraseña muy corta (mínimo 6).";
+                if (error.code === 'auth/email-already-in-use') mensaje = "El email ya está registrado.";
+                if (error.code === 'auth/weak-password') mensaje = "La contraseña es muy corta.";
                 
                 msg.innerText = mensaje;
                 msg.classList.remove('d-none');
-                btn.innerText = originalText; btn.disabled = false;
+                
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         });
     </script>
